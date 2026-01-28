@@ -443,7 +443,7 @@ def main():
     use_on_going = st.sidebar.checkbox("開催中", value=False)
     use_upcoming = st.sidebar.checkbox("開催予定", value=False)
     use_finished = st.sidebar.checkbox("終了", value=False)
-    use_past_bu = st.sidebar.checkbox("終了(BU)", value=False, help="過去のバックアップファイルから取得した終了済みイベント")
+    # use_past_bu = st.sidebar.checkbox("終了(BU)", value=False, help="過去のバックアップファイルから取得した終了済みイベント")
 
 
     selected_statuses = []
