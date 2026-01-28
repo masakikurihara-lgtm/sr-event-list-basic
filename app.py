@@ -366,65 +366,6 @@ def get_total_entries(event_id):
         return "N/A"
 
 
-# --- ▼ ここから追加: 参加者情報取得ヘルパー（get_total_entries の直後に挿入） ▼ ---
-@st.cache_data(ttl=60)
-def get_event_room_list_api(event_id):
-    """ /api/event/room_list?event_id= を叩いて参加ルーム一覧（主に上位30）を取得する """
-    try:
-        resp = requests.get(API_EVENT_ROOM_LIST_URL, headers=HEADERS, params={"event_id": event_id}, timeout=10)
-        resp.raise_for_status()
-        data = resp.json()
-        # キー名が環境で異なるので複数のキーをチェック
-        if isinstance(data, dict):
-            for k in ('list', 'room_list', 'event_entry_list', 'entries', 'data', 'event_list'):
-                if k in data and isinstance(data[k], list):
-                    return data[k]
-        if isinstance(data, list):
-            return data
-    except Exception:
-        # 何か失敗したら空リストを返す（呼び出し側で扱いやすくするため）
-        return []
-    return []
-
-@st.cache_data(ttl=60)
-def get_room_profile_api(room_id):
-    """ /api/room/profile?room_id= を叩いてルームプロフィールを取得する """
-    try:
-        resp = requests.get(f"https://www.showroom-live.com/api/room/profile?room_id={room_id}", headers=HEADERS, timeout=6)
-        resp.raise_for_status()
-        return resp.json() or {}
-    except Exception:
-        return {}
-
-
-def get_official_mark(room_id):
-    """ルームの公式/フリー区分を返す（公/フ）"""
-    try:
-        prof = get_room_profile_api(room_id)
-        if prof.get("is_official") is True:
-            return "公"
-        else:
-            return "フ"
-    except Exception:
-        return ""
-
-
-def _show_rank_score(rank_str):
-    """
-    SHOWランクをソート可能なスコアに変換する簡易ヘルパー。
-    完全網羅的ではありませんが、降順ソートができる程度のスコア化を行います。
-    """
-    if not rank_str:
-        return -999
-    s = str(rank_str).upper()
-    m = re.match(r'([A-Z]+)(\d*)', s)
-    if not m:
-        return -999
-    letters = m.group(1)
-    num = int(m.group(2)) if m.group(2).isdigit() else 0
-    order_map = {'E':0,'D':1,'C':2,'B':3,'A':4,'S':5,'SS':6,'SSS':7}
-    base = order_map.get(letters, 0)
-    return base * 100 - num
 
 
 
@@ -445,11 +386,7 @@ def fetch_room_list_page(event_id: str, page: int):
 
 
 
-
-
-
 # --- UI表示関数 ---
-
 
 
 def get_duration_category(start_ts, end_ts):
