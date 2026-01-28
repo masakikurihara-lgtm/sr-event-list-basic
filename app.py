@@ -654,123 +654,7 @@ def main():
             options=target_options
         )
         
-        # 認証されていればダウンロードボタンとタイムスタンプ変換機能をここに配置
-        if st.session_state.mksp_authenticated:
-            st.sidebar.markdown("")
-            st.sidebar.markdown("")
-            st.sidebar.markdown("---")
-            st.sidebar.header("特別機能")
 
-            # --- 🔄 バックアップ更新ボタン ---
-            if st.sidebar.button("バックアップ更新"):
-                try:
-                    update_archive_file()
-                except Exception as e:
-                    st.sidebar.error(f"バックアップ更新中にエラーが発生しました: {e}")
-
-            if st.sidebar.button("ダウンロード準備"):
-                try:
-                    all_statuses_to_download = [1, 3, 4]
-                    with st.spinner("ダウンロード用の全イベントデータを取得中..."):
-                        all_events_to_download = get_events(all_statuses_to_download)
-                    events_for_df = []
-                    for event in all_events_to_download:
-                        if all(k in event for k in ["event_id", "is_event_block", "is_entry_scope_inner", "event_name", "image_m", "started_at", "ended_at", "event_url_key", "show_ranking"]):
-                            event_data = {
-                                "event_id": event["event_id"],
-                                "is_event_block": event["is_event_block"],
-                                "is_entry_scope_inner": event["is_entry_scope_inner"],
-                                "event_name": event["event_name"],
-                                "image_m": event["image_m"],
-                                "started_at": event["started_at"], # Unixタイムスタンプ形式に戻す
-                                "ended_at": event["ended_at"],     # Unixタイムスタンプ形式に戻す
-                                "event_url_key": event["event_url_key"],
-                                "show_ranking": event["show_ranking"]
-                            }
-                            events_for_df.append(event_data)
-                    
-                    if events_for_df:
-                        df = pd.DataFrame(events_for_df)
-                        csv_data = df.to_csv(index=False).encode('utf-8-sig')
-                        st.sidebar.download_button(
-                            label="ダウンロード開始",
-                            data=csv_data,
-                            file_name=f"showroom_events_{datetime.now(JST).strftime('%Y%m%d_%H%M%S')}.csv",
-                            mime="text/csv",
-                            key="download_button_trigger",
-                        )
-                        st.sidebar.success("ダウンロード準備ができました。上記のボタンをクリックしてください。")
-                    else:
-                        st.sidebar.warning("ダウンロード可能なイベントデータがありませんでした。")
-                except Exception as e:
-                    st.sidebar.error(f"データのダウンロード中にエラーが発生しました: {e}")
-
-            # タイムスタンプ変換機能
-            st.sidebar.markdown("---")
-            st.sidebar.markdown("#### 🕒 タイムスタンプから日時へ変換")
-            timestamp_input = st.sidebar.text_input(
-                "タイムスタンプを入力",
-                placeholder="例: 1754902800",
-                key="timestamp_input"
-            )
-
-            if st.sidebar.button("タイムスタンプから日時へ変換"):
-                if timestamp_input and timestamp_input.isdigit():
-                    try:
-                        ts = int(timestamp_input)
-                        converted_dt = datetime.fromtimestamp(ts, JST)
-                        st.sidebar.success(
-                            f"**変換結果:**\n\n"
-                            f"**日時:** {converted_dt.strftime('%Y/%m/%d %H:%M:%S')}"
-                        )
-                    except ValueError:
-                        st.sidebar.error("無効なタイムスタンプです。数値を入力してください。")
-                else:
-                    st.sidebar.warning("タイムスタンプを入力してください。")
-
-            # 日時からタイムスタンプへ変換
-            st.sidebar.markdown("---")
-            st.sidebar.markdown("#### 📅 日時からタイムスタンプへ変換")
-            datetime_input = st.sidebar.text_input(
-                "日時を入力 (YYYY/MM/DD HH:MM)",
-                placeholder="例: 2025/08/11 18:00",
-                key="datetime_input"
-            )
-            
-            # 日時を「開始時間」のタイムスタンプに変換するボタン
-            if st.sidebar.button("日時から開始タイムスタンプへ変換"):
-                if datetime_input:
-                    try:
-                        dt_obj_naive = datetime.strptime(datetime_input.strip(), '%Y/%m/%d %H:%M').replace(second=0)
-                        dt_obj = JST.localize(dt_obj_naive, is_dst=None)
-                        timestamp = int(dt_obj.timestamp())
-                        st.sidebar.success(
-                            f"**開始タイムスタンプの変換結果:**\n\n"
-                            f"**タイムスタンプ:** {timestamp}"
-                        )
-                    except ValueError:
-                        st.sidebar.error("無効な日時形式です。'YYYY/MM/DD HH:MM'形式で入力してください。")
-                else:
-                    st.sidebar.warning("日時を入力してください。")
-            
-            # 日時を「終了時間」のタイムスタンプへ変換するボタン
-            if st.sidebar.button("日時から終了タイムスタンプへ変換"):
-                if datetime_input:
-                    try:
-                        dt_obj_naive = datetime.strptime(datetime_input.strip(), '%Y/%m/%d %H:%M').replace(second=59)
-                        dt_obj = JST.localize(dt_obj_naive, is_dst=None)
-                        timestamp = int(dt_obj.timestamp())
-                        st.sidebar.success(
-                            f"**終了タイムスタンプの変換結果:**\n\n"
-                            f"**タイムスタンプ:** {timestamp}"
-                        )
-                    except ValueError:
-                        st.sidebar.error("無効な日時形式です。'YYYY/MM/DD HH:MM'形式で入力してください。")
-                else:
-                    st.sidebar.warning("日時を入力してください。")
-        
-        # フィルタリングされたイベントリスト
-        filtered_events = all_events
         
         if selected_start_dates:
             # start_date_options を参照する
@@ -813,8 +697,6 @@ def main():
             st.success(f"{filtered_count}件のイベントが見つかりました。")
         
         st.markdown("---")
-
-
 
 
         # ===============================
