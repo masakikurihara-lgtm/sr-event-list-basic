@@ -434,6 +434,14 @@ def main():
     # --- フィルタリング機能 ---
     st.sidebar.header("表示フィルタ")
 
+    # --- 簡易版の制約表示 ---
+    st.sidebar.warning("""
+    **⚠️ 簡易版に於ける制約**
+    * 一覧表示のみの表示となります。
+    * チェックボックスは複数チェックすることができません。
+    * 「終了」は、終了日時から1ヶ月以内のイベントのみ対象となります。
+    """)
+
     # 1つだけ選べるように制御する仕組み
     def handle_click(key):
         for k in ["use_on_going", "use_upcoming", "use_finished"]:
