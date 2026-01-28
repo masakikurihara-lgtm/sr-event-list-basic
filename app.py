@@ -242,9 +242,6 @@ def update_archive_file():
     )
 
 
-if "authenticated" not in st.session_state:  #認証用
-    st.session_state.authenticated = False  #認証用
-
 @st.cache_data(ttl=600)  # 10分間キャッシュを保持
 def get_events(statuses):
     """
@@ -367,10 +364,6 @@ def get_total_entries(event_id):
 
 
 
-
-
-HEADERS = {"User-Agent": "Mozilla/5.0"}
-
 # ✅ event_id 単位でキャッシュ（ページ単位も含む）
 @st.cache_data(ttl=300)
 def fetch_room_list_page(event_id: str, page: int):
@@ -383,7 +376,6 @@ def fetch_room_list_page(event_id: str, page: int):
     except Exception:
         pass
     return []
-
 
 
 # --- UI表示関数 ---
@@ -406,9 +398,6 @@ def get_duration_category(start_ts, end_ts):
         return "その他"
 
 
-
-
-
 # --- メイン処理 ---
 def main():
     # ページ設定
@@ -425,55 +414,6 @@ def main():
     #st.markdown("<h1 style='font-size:2.5em;'>🎤 SHOWROOM イベント一覧</h1>", unsafe_allow_html=True)
     st.write("")
 
-
-    # ▼▼ 認証ステップ ▼▼
-    if "authenticated" not in st.session_state:
-        st.session_state.authenticated = False
-
-    if "mksp_authenticated" not in st.session_state:
-        st.session_state.mksp_authenticated = False
-        
-    if not st.session_state.authenticated:
-        st.markdown("##### 🔑 認証コードを入力してください")
-        input_room_id = st.text_input(
-            "認証コードを入力してください:",
-            placeholder="",
-            type="password",
-            key="room_id_input"
-        )
-
-        # 認証ボタン
-        if st.button("認証する"):
-            if input_room_id:  # 入力が空でない場合のみ
-                if input_room_id.strip() == "mksp154851":
-                    st.session_state.authenticated = True
-                    st.session_state.mksp_authenticated = True
-                    st.success("✅ 特別な認証に成功しました。ツールを利用できます。")
-                    st.rerun()
-                else:
-                    try:
-                        response = requests.get(ROOM_LIST_URL, timeout=5)
-                        response.raise_for_status()
-                        # room_df = pd.read_csv(io.StringIO(response.text), header=None)
-                        import pandas # 念のためこの行の直前か、ファイル冒頭に入れておく
-                        room_df = pandas.read_csv(io.StringIO(response.text), header=None)
-    
-                        valid_codes = set(str(x).strip() for x in room_df.iloc[:, 0].dropna())
-    
-                        if input_room_id.strip() in valid_codes:
-                            st.session_state.authenticated = True
-                            st.success("✅ 認証に成功しました。ツールを利用できます。")
-                            st.rerun()  # 認証成功後に再読み込み
-                        else:
-                            st.error("❌ 認証コードが無効です。正しい認証コードを入力してください。")
-                    except Exception as e:
-                        st.error(f"認証リストを取得できませんでした: {e}")
-            else:
-                st.warning("認証コードを入力してください。")
-                
-        # 認証が終わるまで他のUIを描画しない
-        st.stop()
-    # ▲▲ 認証ステップここまで ▲▲
 
 
     # 行間と余白の調整
@@ -654,13 +594,6 @@ def main():
             options=target_options
         )
         
-        # 認証されていればダウンロードボタンとタイムスタンプ変換機能をここに配置
-        if st.session_state.mksp_authenticated:
-            st.sidebar.markdown("")
-            st.sidebar.markdown("")
-            st.sidebar.markdown("---")
-            st.sidebar.header("特別機能")
-
 
         
         # フィルタリングされたイベントリスト
