@@ -402,13 +402,13 @@ def get_duration_category(start_ts, end_ts):
 def main():
     # ページ設定
     st.set_page_config(
-        page_title="SHOWROOM イベント一覧",
+        page_title="SHOWROOM イベント一覧（簡易版）",
         page_icon="🎤",
         layout="wide"
     )
 
     st.markdown(
-        "<h1 style='font-size:28px; text-align:left; color:#1f2937;'>🎤 SHOWROOM イベント一覧</h1>",
+        "<h1 style='font-size:28px; text-align:left; color:#1f2937;'>🎤 SHOWROOM イベント一覧（簡易版）</h1>",
         unsafe_allow_html=True
     )
 
@@ -424,7 +424,7 @@ def main():
     # </div>
     # """, unsafe_allow_html=True)
 
-    #st.markdown("<h1 style='font-size:2.5em;'>🎤 SHOWROOM イベント一覧</h1>", unsafe_allow_html=True)
+    #st.markdown("<h1 style='font-size:2.5em;'>🎤 SHOWROOM イベント一覧（簡易版）</h1>", unsafe_allow_html=True)
     st.write("")
 
 
