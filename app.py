@@ -652,6 +652,17 @@ def main():
 
         st.markdown("##### 📋 一覧表示")
 
+        # --- 追加：参加ルーム数をまとめて高速で取得する ---
+        event_ids = [e["event_id"] for e in filtered_events]
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            # 10個同時にAPIを叩く
+            total_entries_list = list(executor.map(get_total_entries, event_ids))
+        
+        # 取得した結果を各イベントデータの中に保存しておく
+        for e, total in zip(filtered_events, total_entries_list):
+            e["total_entries_result"] = total
+        # ----------------------------------------------
+
         # --- 1. CSVデータの生成 (元の文字化けしないロジックを維持) ---
         download_data = []
         for e in filtered_events:
@@ -660,7 +671,7 @@ def main():
                 "対象": "対象者限定" if e.get("is_entry_scope_inner") else "全ライバー",
                 "開始": datetime.fromtimestamp(e["started_at"], JST).strftime('%Y/%m/%d %H:%M'),
                 "終了": datetime.fromtimestamp(e["ended_at"], JST).strftime('%Y/%m/%d %H:%M'),
-                "参加ルーム数": get_total_entries(e["event_id"])
+                "参加ルーム数": e.get("total_entries_result", 0)
             })
 
         df_download = pd.DataFrame(download_data)
@@ -763,7 +774,7 @@ def main():
                   <td class="col-center">{"対象者限定" if e.get("is_entry_scope_inner") else "全ライバー"}</td>
                   <td class="col-center">{datetime.fromtimestamp(e["started_at"], JST).strftime('%Y/%m/%d %H:%M')}</td>
                   <td class="col-center">{datetime.fromtimestamp(e["ended_at"], JST).strftime('%Y/%m/%d %H:%M')}</td>
-                  <td class="col-center">{get_total_entries(e["event_id"])}</td>
+                  <td class="col-center">{e.get("total_entries_result", 0)}</td>
                 </tr>
             """
 
