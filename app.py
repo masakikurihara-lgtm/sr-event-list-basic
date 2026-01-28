@@ -413,16 +413,16 @@ def main():
     )
 
     # 簡易版の制約をテキストでシンプルに表示
-    st.markdown("""
-    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 5px solid #6c757d; margin-bottom: 20px;">
-        <p style="margin: 0; font-weight: bold; color: #495057;">💡 簡易版に於ける制約</p>
-        <ul style="margin: 5px 0 0 0; font-size: 14px; color: #6c757d;">
-            <li>一覧表示のみの表示となります。</li>
-            <li>チェックボックスは複数チェックすることができません。</li>
-            <li>「終了」は、終了日時から1ヶ月以内のイベントのみ対象となります。</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    # st.markdown("""
+    # <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 5px solid #6c757d; margin-bottom: 20px;">
+    #     <p style="margin: 0; font-weight: bold; color: #495057;">💡 簡易版に於ける制約</p>
+    #     <ul style="margin: 5px 0 0 0; font-size: 14px; color: #6c757d;">
+    #         <li>一覧表示のみの表示となります。</li>
+    #         <li>チェックボックスは複数チェックすることができません。</li>
+    #         <li>「終了」は、終了日時から1ヶ月以内のイベントのみ対象となります。</li>
+    #     </ul>
+    # </div>
+    # """, unsafe_allow_html=True)
 
     #st.markdown("<h1 style='font-size:2.5em;'>🎤 SHOWROOM イベント一覧</h1>", unsafe_allow_html=True)
     st.write("")
