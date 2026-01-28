@@ -433,33 +433,30 @@ def main():
 
     # --- フィルタリング機能 ---
     st.sidebar.header("表示フィルタ")
-    
-    # 1. ラジオボタンに変更（「なし」を選択肢に入れることで初期状態を制御可能）
-    filter_mode = st.sidebar.radio(
-        "ステータスを選択",
-        options=["選択なし", "開催中", "開催予定", "終了"],
-        index=0  # デフォルトは「選択なし」
-    )
 
-    # 2. 既存の変数（フラグ）をラジオボタンの結果から判定
-    use_on_going = (filter_mode == "開催中")
-    use_upcoming = (filter_mode == "開催予定")
-    use_finished = (filter_mode == "終了")
-    
-    # 終了(BU)は常にオフ
+    # 1つだけ選べるように制御する仕組み
+    def handle_click(key):
+        for k in ["use_on_going", "use_upcoming", "use_finished"]:
+            if k != key:
+                st.session_state[k] = False
+
+    # チェックボックス本体（見た目と行間を維持）
+    use_on_going = st.sidebar.checkbox("開催中", key="use_on_going", on_change=handle_click, args=("use_on_going",))
+    use_upcoming = st.sidebar.checkbox("開催予定", key="use_upcoming", on_change=handle_click, args=("use_upcoming",))
+    use_finished = st.sidebar.checkbox("終了", key="use_finished", on_change=handle_click, args=("use_finished",))
+
+    # 変数だけ残して常にオフ
     use_past_bu = False 
 
-    # --- 以下、既存のロジックがそのまま動きます ---
+    # 選択された情報をまとめる（これ以降のプログラムが動くように調整）
+    status_map = {"use_on_going": 1, "use_upcoming": 3, "use_finished": 4}
     selected_statuses = []
-    if use_on_going:
-        selected_statuses.append(1)
-    if use_upcoming:
-        selected_statuses.append(3)
-    if use_finished:
-        selected_statuses.append(4)
+    for k, v in status_map.items():
+        if st.session_state.get(k):
+            selected_statuses.append(v)
 
-    if filter_mode == "選択なし":
-        st.warning("表示するステータスをサイドバーで選択してください。")
+    if not selected_statuses and not use_past_bu:
+        st.warning("表示するステータスをサイドバーで1つ以上選択してください。")
     
     
     # 選択されたステータスに基づいてイベント情報を取得
