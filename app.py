@@ -447,6 +447,10 @@ def main():
     # --- フィルタリング機能 ---
     st.sidebar.header("表示フィルタ")
 
+    # ✅【追加】初回起動時に「開催中」をONにする設定
+    if "use_on_going" not in st.session_state:
+        st.session_state["use_on_going"] = True
+
     # 1つだけ選べるように制御する仕組み
     def handle_click(key):
         for k in ["use_on_going", "use_upcoming", "use_finished"]:
